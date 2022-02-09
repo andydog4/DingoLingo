@@ -63,17 +63,17 @@ async def play_check(ctx):
     vc_rule = sett.get('user_must_be_in_vc')
 
     if cm_channel != None:
-        if cm_channel != ctx.message.channel.id:
+        if cm_channel != ctx.channel.id:
             await ctx.send(config.WRONG_CHANNEL_MESSAGE)
             return False
 
     if vc_rule == True:
-        author_voice = ctx.message.author.voice
+        author_voice = ctx.author.voice
         bot_vc = ctx.guild.voice_client.channel
         if author_voice == None:
             await ctx.send(config.USER_NOT_IN_VC_MESSAGE)
             return False
-        elif ctx.message.author.voice.channel != bot_vc:
+        elif ctx.author.voice.channel != bot_vc:
             await ctx.send(config.USER_NOT_IN_VC_MESSAGE)
             return False
 
