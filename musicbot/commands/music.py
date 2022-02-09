@@ -164,7 +164,7 @@ class Music(commands.Cog):
         await utils.guild_to_audiocontroller[current_guild].stop_player()
         await ctx.send("Stopped all sessions :octagonal_sign:")
 
-    @commands.slash_command(name='move', description=config.HELP_MOVE_LONG, help=config.HELP_MOVE_SHORT, aliases=['mv'])
+    #@commands.slash_command(name='move', description=config.HELP_MOVE_LONG, help=config.HELP_MOVE_SHORT, aliases=['mv'])
     async def _move(self, ctx, *args):
         if len(args) != 2:
             ctx.send("Wrong number of arguments")
@@ -286,7 +286,7 @@ class Music(commands.Cog):
         await ctx.send(utils.guild_to_audiocontroller[current_guild].track_history())
 
     @commands.slash_command(name='volume', aliases=["vol"], description=config.HELP_VOL_LONG, help=config.HELP_VOL_SHORT)
-    async def _volume(self, ctx, *args):
+    async def _volume(self, ctx, volume: int = None):
         if ctx.guild is None:
             await ctx.send(config.NO_GUILD_MESSAGE)
             return
@@ -294,13 +294,11 @@ class Music(commands.Cog):
         if await utils.play_check(ctx) == False:
             return
 
-        if len(args) == 0:
+        if not volume:
             await ctx.send("Current volume: {}% :speaker:".format(utils.guild_to_audiocontroller[ctx.guild]._volume))
             return
 
         try:
-            volume = args[0]
-            volume = int(volume)
             if volume > 100 or volume < 0:
                 raise Exception('')
             current_guild = utils.get_guild(self.bot, ctx)
