@@ -160,7 +160,7 @@ cython_debug/
 #.idea/
 
 .vscode
-musicbot/generated/settings.json
-musicbot/generated/settings.json
-src/config/cookies/cookies.txt
-src/config/config.py
+#musicbot/generated/settings.json
+#musicbot/generated/settings.json
+#src/config/cookies/cookies.txt
+#src/config/config.py
