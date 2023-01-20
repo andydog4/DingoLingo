@@ -10,8 +10,8 @@ from musicbot.utils import guild_to_audiocontroller, guild_to_settings
 
 import message_hook
 
-initial_extensions = ['musicbot.commands.music',
-                      'musicbot.commands.general', 'musicbot.plugins.button']
+initial_extensions = ['musicbot.commands.music', 'musicbot.commands.general',
+                      'musicbot.plugins.button', "musicbot.commands.extra"]
 config.ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
 config.COOKIE_PATH = config.ABSOLUTE_PATH + config.COOKIE_PATH
 
@@ -66,17 +66,14 @@ class disClient(commands.Bot):
         vc_channels = guild.voice_channels
 
         if sett.get('vc_timeout') == False:
-            if sett.get('start_voice_channel') == None:
-                try:
-                    await guild_to_audiocontroller[guild].register_voice_channel(guild.voice_channels[0])
-                except Exception as e:
-                    print(e)
-
-            else:
+            if not sett.get('start_voice_channel') == None:
                 for vc in vc_channels:
                     if vc.id == sett.get('start_voice_channel'):
                         try:
-                            await guild_to_audiocontroller[guild].register_voice_channel(vc_channels[vc_channels.index(vc)])
+                            controler = guild_to_audiocontroller[guild]
+                            await controler.register_voice_channel(vc_channels[vc_channels.index(vc)])
+                            if not sett.get("autoplay_url") == "":
+                                await controler.process_song(sett.get("autoplay_url"))
                         except Exception as e:
                             print(e)
 

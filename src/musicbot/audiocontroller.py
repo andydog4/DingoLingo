@@ -134,7 +134,8 @@ class AudioController(object):
 
         if host == linkutils.Sites.Unknown:
             if linkutils.get_url(track) is not None:
-                return None
+                #return None
+                pass
 
             track = self.search_youtube(track)
 
@@ -155,6 +156,7 @@ class AudioController(object):
             except Exception as e:
                 if "ERROR: Sign in to confirm your age" in str(e):
                     return None
+                else: raise Exception("I have no fucking idea")
         except:
             downloader = yt_dlp.YoutubeDL(
                 {'title': True, "cookiefile": config.COOKIE_PATH})
