@@ -10,7 +10,7 @@ from musicbot.utils import guild_to_audiocontroller, guild_to_settings
 
 initial_extensions = ['musicbot.commands.music',
                       'musicbot.commands.general', 'musicbot.plugins.button']
-bot = commands.Bot(command_prefix=config.BOT_PREFIX,
+bot = commands.Bot(intents=discord.Intents.default(), command_prefix=config.BOT_PREFIX,
                    pm_help=True, case_insensitive=True)
 
 

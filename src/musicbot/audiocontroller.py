@@ -342,12 +342,12 @@ class AudioController(object):
 
     async def uconnect(self, ctx):
 
-        if not ctx.author.voice:
+        if not ctx.user.voice:
             await ctx.send(config.NO_GUILD_MESSAGE)
             return False
 
         if self.guild.voice_client == None:
-            await self.register_voice_channel(ctx.author.voice.channel)
+            await self.register_voice_channel(ctx.user.voice.channel)
         else:
             await ctx.send(config.ALREADY_CONNECTED_MESSAGE)
 

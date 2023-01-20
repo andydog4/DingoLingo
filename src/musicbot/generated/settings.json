@@ -1,0 +1,32 @@
+{
+    "228454166014459904": {
+        "id": 228454166014459904,
+        "default_nickname": "",
+        "command_channel": null,
+        "start_voice_channel": null,
+        "user_must_be_in_vc": true,
+        "button_emote": "",
+        "default_volume": 100,
+        "vc_timeout": true
+    },
+    "631341189760548894": {
+        "id": 631341189760548894,
+        "default_nickname": "",
+        "command_channel": null,
+        "start_voice_channel": null,
+        "user_must_be_in_vc": true,
+        "button_emote": "",
+        "default_volume": 100,
+        "vc_timeout": true
+    },
+    "882402389242560546": {
+        "id": 882402389242560546,
+        "default_nickname": "",
+        "command_channel": null,
+        "start_voice_channel": null,
+        "user_must_be_in_vc": true,
+        "button_emote": "",
+        "default_volume": 100,
+        "vc_timeout": true
+    }
+}

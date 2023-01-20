@@ -68,12 +68,12 @@ async def play_check(ctx):
             return False
 
     if vc_rule == True:
-        author_voice = ctx.author.voice
+        author_voice = ctx.user.voice
         bot_vc = ctx.guild.voice_client.channel
         if author_voice == None:
             await ctx.send(config.USER_NOT_IN_VC_MESSAGE)
             return False
-        elif ctx.author.voice.channel != bot_vc:
+        elif ctx.user.voice.channel != bot_vc:
             await ctx.send(config.USER_NOT_IN_VC_MESSAGE)
             return False
 
