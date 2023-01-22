@@ -28,7 +28,7 @@ class Extra(commands.Cog):
 
     #sync commands with discord
     @app_commands.command(name="sync")
-    @commands.is_owner
+    @commands.is_owner()
     async def _sync(self, inter:discord.Interaction) -> None:
         self.bot.tree.sync()
 
