@@ -11,7 +11,7 @@ from musicbot.utils import guild_to_audiocontroller, guild_to_settings
 import message_hook
 
 initial_extensions = ['musicbot.commands.music', 'musicbot.commands.general',
-                      'musicbot.plugins.button', "musicbot.commands.extra"]
+                      "musicbot.commands.extra"]
 config.ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
 config.COOKIE_PATH = config.ABSOLUTE_PATH + config.COOKIE_PATH
 
@@ -29,10 +29,10 @@ class disClient(commands.Bot):
                 await self.load_extension(extension)
             except Exception as e:
                 print(e)
-        #await self.tree.sync()
+        #await self.tree.sync() 
 
 
-    async def on_ready(self):
+    async def on_ready(self) -> None:
         print(config.STARTUP_MESSAGE)
         await self.change_presence(status=discord.Status.online, activity=discord.Game(name="Music"))
 
@@ -43,12 +43,12 @@ class disClient(commands.Bot):
         print(config.STARTUP_COMPLETE_MESSAGE)
 
         
-    async def on_guild_join(self,guild):
+    async def on_guild_join(self,guild) -> None:
         print(guild.name)
         await self.register(guild)
 
 
-    async def register(self,guild):
+    async def register(self,guild) -> None:
 
         guild_to_settings[guild] = Settings(guild)
         guild_to_audiocontroller[guild] = AudioController(self, guild)
@@ -74,6 +74,7 @@ class disClient(commands.Bot):
                             await controler.register_voice_channel(vc_channels[vc_channels.index(vc)])
                             if not sett.get("autoplay_url") == "":
                                 await controler.process_song(sett.get("autoplay_url"))
+                                await controler.timer.cancel()
                         except Exception as e:
                             print(e)
 
@@ -87,5 +88,5 @@ if __name__ == '__main__':
         print("Error: No bot token!")
         exit
 
-    client = disClient(intents=discord.Intents.default(), command_prefix=config.BOT_PREFIX, pm_help=True, case_insensitive=True)
+    client = disClient(intents=discord.Intents.default(), test_guilds=[228454166014459904], command_prefix=config.BOT_PREFIX, case_insensitive=True)
     client.run(config.BOT_TOKEN, reconnect=True)

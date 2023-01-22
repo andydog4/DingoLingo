@@ -307,7 +307,7 @@ class Music(commands.Cog):
             return
 
         if not volume:
-            await ctx.send("Current volume: {}% :speaker:".format(utils.guild_to_audiocontroller[ctx.guild]._volume))
+            await ctx.send("Current volume: {}% :speaker:".format(utils.guild_to_audiocontroller[ctx.guild]._volume, ephemeral=True))
             return
 
         try:
