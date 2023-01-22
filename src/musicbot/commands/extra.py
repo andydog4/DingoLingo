@@ -28,12 +28,14 @@ class Extra(commands.Cog):
 
     #sync commands with discord
     @app_commands.command(name="sync")
+    @commands.is_owner
     async def _sync(self, inter:discord.Interaction) -> None:
         self.bot.tree.sync()
 
     
     #play radio stream
     @app_commands.command(name="radio", description="Plays the radio")
+    @app_commands.guild_only
     @app_commands.choices(station=[app_commands.Choice(name=station, value=station) for station in stations.keys()])
     async def _radio(self, inter:discord.Interaction, station:str) -> None:
         
