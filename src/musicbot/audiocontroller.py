@@ -1,13 +1,13 @@
-import asyncio
+import asyncio, logging, discord, yt_dlp
 import concurrent.futures
 
-import discord
-import yt_dlp
 from config import config
 
 from musicbot import linkutils, utils
 from musicbot.playlist import Playlist
 from musicbot.songinfo import Song
+
+from musicbot.speed_logger import timer
 
 
 class AudioController(object):
@@ -65,6 +65,7 @@ class AudioController(object):
         coro = self.play_song(next_song)
         self.bot.loop.create_task(coro)
 
+    @timer
     async def play_song(self, song):
         """Plays a song object"""
 
@@ -126,7 +127,7 @@ class AudioController(object):
 
             if self.current_song == None:
                 await self.play_song(self.playlist.playque[0])
-                print("Playing {}".format(track))
+                logging.info("Playing {}".format(track))
 
             song = Song(linkutils.Origins.Playlist,
                         linkutils.Sites.Unknown)
@@ -174,7 +175,7 @@ class AudioController(object):
 
         self.playlist.add(song)
         if self.current_song == None:
-            print("Playing {}".format(track))
+            logging.info("Playing {}".format(track))
             await self.play_song(song)
 
         return song

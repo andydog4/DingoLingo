@@ -8,12 +8,12 @@ from config import config
 stations = {
     "Radio Brony":"https://radiobrony.live/hls/aac_hifi.m3u8",
     "Brony Radio Germany":"http://radio.bronyradiogermany.com:8000/opus",
-    "The Rock":"https://icecast.mediaworks.nz/rock_128kbps",
+    "The Rock":"https://livestream.mediaworks.nz/radio_origin/rock_[CHC]_128kbps/chunklist.m3u8",
     "More FM":"https://livestream.mediaworks.nz/radio_origin/more_[CHC]_128kbps/playlist.m3u8",
     "The Edge":"https://livestream.mediaworks.nz/radio_origin/edge_[QTN]_128kbps/chunklist.m3u8",
     "George FM":"https://livestream.mediaworks.nz/radio_origin/george_[QTN]_128kbps/playlist.m3u8",
-    "Hauraki":"https://ais-nzme.streamguys1.com/nz_009/playlist.m3u8?aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=6067669815&clientType=web&companionAds=false&deviceName=web-desktop&dist=iheart&host=webapp.NZ&listenerId=&playedFrom=157&pname=live_profile&profileId=6067669815&stationid=6191&terminalId=162&territory=NZ",
-    "The Hits":"https://ais-nzme.streamguys1.com/nz_006/playlist.m3u8?aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=6067669815&clientType=web&companionAds=false&deviceName=web-desktop&dist=iheart&host=webapp.NZ&listenerId=&playedFrom=157&pname=live_profile&profileId=6067669815&stationid=6199&terminalId=162&territory=NZ"
+    "Hauraki (laggy)":"https://ais-nzme.streamguys1.com/nz_009/playlist.m3u8?aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=6067669815&clientType=web&companionAds=false&deviceName=web-desktop&dist=iheart&host=webapp.NZ&listenerId=&playedFrom=157&pname=live_profile&profileId=6067669815&stationid=6191&terminalId=162&territory=NZ",
+    "The Hits (laggy)":"https://ais-nzme.streamguys1.com/nz_006/playlist.m3u8?aw_0_1st.playerid=iHeartRadioWebPlayer&aw_0_1st.skey=6067669815&clientType=web&companionAds=false&deviceName=web-desktop&dist=iheart&host=webapp.NZ&listenerId=&playedFrom=157&pname=live_profile&profileId=6067669815&stationid=6199&terminalId=162&territory=NZ"
     }
 
 class Extra(commands.Cog):
@@ -38,12 +38,12 @@ class Extra(commands.Cog):
     @app_commands.guild_only
     @app_commands.choices(station=[app_commands.Choice(name=station, value=station) for station in stations.keys()])
     async def _radio(self, inter:discord.Interaction, station:str) -> None:
-        
         await utils.guild_to_audiocontroller[inter.guild].stop_player()
         await self.bot.get_cog('Music')._play_song.callback(self, inter, track=stations[station])
         song = songinfo.Song.Sinfo("Internet",station,-1,None,None)
         await inter.send(embed=song.format_output("Now Playing"))
-    
+
+
     #autocompleate radio stream command
     @_radio.autocomplete("station")
     async def _radio_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
