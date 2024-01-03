@@ -12,11 +12,6 @@ def get_guild(bot, command):
     """Gets the guild a command belongs to. Useful, if the command was sent via pm."""
     if command.guild is not None:
         return command.guild
-    for guild in bot.guilds:
-        for channel in guild.voice_channels:
-            if command.author in channel.members:
-                return guild
-    return None
 
 
 async def connect_to_channel(guild, dest_channel_name, ctx, switch=False, default=True):
@@ -59,13 +54,7 @@ async def play_check(ctx):
 
     sett = guild_to_settings[ctx.guild]
 
-    cm_channel = sett.get('command_channel')
     vc_rule = sett.get('user_must_be_in_vc')
-
-    if cm_channel != None:
-        if cm_channel != ctx.channel.id:
-            await ctx.send(config.WRONG_CHANNEL_MESSAGE)
-            return False
 
     if vc_rule == True:
         author_voice = ctx.user.voice

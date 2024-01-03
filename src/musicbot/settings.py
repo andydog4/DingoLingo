@@ -6,7 +6,6 @@ from config import config
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-
 class Settings():
 
     def __init__(self, guild):

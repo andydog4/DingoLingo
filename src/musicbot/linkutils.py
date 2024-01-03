@@ -37,17 +37,18 @@ async def convert_spotify(url):
         if "?si=" in url:
             url = result.group(0) + "&nd=1"
 
-    async with session.get(url) as response:
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as response:
 
-        page = await response.text()
-        soup = BeautifulSoup(page, 'html.parser')
+            page = await response.text()
+            soup = BeautifulSoup(page, 'html.parser')
 
-        title = soup.find('title')
-        title = title.string
-        title = title.replace('- song by', '')
-        title = title.replace('| Spotify', '')
-        
-        return title
+            title = soup.find('title')
+            title = title.string
+            title = title.replace('- song by', '')
+            title = title.replace('| Spotify', '')
+            
+            return title
 
 
 async def get_spotify_playlist(url):

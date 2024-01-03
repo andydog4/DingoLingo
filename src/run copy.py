@@ -1,6 +1,6 @@
 import os
 
-import discord
+import discord, logging
 from discord.ext import commands
 
 from config import config
@@ -8,6 +8,7 @@ from musicbot.audiocontroller import AudioController
 from musicbot.settings import Settings
 from musicbot.utils import guild_to_audiocontroller, guild_to_settings
 
+from musicbot import logger
 import message_hook
 
 initial_extensions = ['musicbot.commands.music', 'musicbot.commands.general',
@@ -28,23 +29,23 @@ class disClient(commands.Bot):
             try:
                 await self.load_extension(extension)
             except Exception as e:
-                print(e)
+                logging.error(e)
         #await self.tree.sync() 
 
 
     async def on_ready(self) -> None:
-        print(config.STARTUP_MESSAGE)
+        logging.info(config.STARTUP_MESSAGE)
         await self.change_presence(status=discord.Status.online, activity=discord.Game(name="Music"))
 
         for guild in self.guilds:
             await self.register(guild)
-            print("Joined {}".format(guild.name))
+            logging.info("Joined {}".format(guild.name))
 
-        print(config.STARTUP_COMPLETE_MESSAGE)
+        logging.info(config.STARTUP_COMPLETE_MESSAGE)
 
         
     async def on_guild_join(self,guild) -> None:
-        print(guild.name)
+        logging.info(guild.name)
         await self.register(guild)
 
 
@@ -55,10 +56,6 @@ class disClient(commands.Bot):
 
         sett = guild_to_settings[guild]
 
-        try:
-            await guild.me.edit(nick=sett.get('default_nickname'))
-        except:
-            pass
 
         if config.GLOBAL_DISABLE_AUTOJOIN_VC == True:
             return
@@ -76,7 +73,7 @@ class disClient(commands.Bot):
                                 await controler.process_song(sett.get("autoplay_url"))
                                 await controler.timer.cancel()
                         except Exception as e:
-                            print(e)
+                            logging.error(e)
 
 
 
@@ -85,8 +82,8 @@ class disClient(commands.Bot):
 if __name__ == '__main__':
 
     if config.BOT_TOKEN == "":
-        print("Error: No bot token!")
+        logging.error("Error: No bot token!")
         exit
 
     client = disClient(intents=discord.Intents.default(), test_guilds=[228454166014459904], command_prefix=config.BOT_PREFIX, case_insensitive=True)
-    client.run(config.BOT_TOKEN, reconnect=True)
+    client.run(config.BOT_TOKEN, reconnect=True, root_logger=True)
