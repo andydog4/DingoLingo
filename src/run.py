@@ -84,5 +84,5 @@ if __name__ == '__main__':
         exit
     intents = discord.Intents.default()
     intents.message_content = True
-    client = disClient(intents=intents, test_guilds=[228454166014459904], command_prefix=config.BOT_PREFIX, case_insensitive=True)
+    client = disClient(intents=intents, test_guilds=os.getenv("test_guilds"), command_prefix=config.BOT_PREFIX, case_insensitive=True)
     client.run(os.getenv("discord_bot_token"), reconnect=True, root_logger=True)
