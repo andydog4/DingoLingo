@@ -98,6 +98,7 @@ class AudioController(object):
             song.info.webpage_url = r.get('webpage_url')
             song.info.thumbnail = r.get('thumbnails')[0]['url']
 
+        logging.info(f"playing {song.info.title}")
         self.playlist.add_name(song.info.title)
         self.current_song = song
 

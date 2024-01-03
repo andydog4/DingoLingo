@@ -160,3 +160,5 @@ cython_debug/
 #.idea/
 src/config
 settings.json
+.prof_stats
+profiling_stats.txt

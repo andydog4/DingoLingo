@@ -1,6 +1,8 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
-import discord
+import discord, logging
 from discord.ext import commands
 
 from config import config
@@ -8,77 +10,79 @@ from musicbot.audiocontroller import AudioController
 from musicbot.settings import Settings
 from musicbot.utils import guild_to_audiocontroller, guild_to_settings
 
-initial_extensions = ['musicbot.commands.music',
-                      'musicbot.commands.general', 'musicbot.plugins.button']
-bot = commands.Bot(intents=discord.Intents.default(), command_prefix=config.BOT_PREFIX,
-                   pm_help=True, case_insensitive=True)
+import message_hook
+
+initial_extensions = ['musicbot.commands.music', 'musicbot.commands.general',
+                      "musicbot.commands.extra"]
+config.ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
+config.COOKIE_PATH = config.ABSOLUTE_PATH + config.COOKIE_PATH
+
+#new
+class disClient(commands.Bot):
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+
+
+    async def setup_hook(self) -> None:
+        await super().setup_hook()
+
+        for extension in initial_extensions:
+            try:
+                await self.load_extension(extension)
+            except Exception as e:
+                logging.error(e)
+
+
+    async def on_ready(self) -> None:
+        logging.info(config.STARTUP_MESSAGE)
+        await self.change_presence(status=discord.Status.online, activity=discord.Game(name="Music"))
+
+        for guild in self.guilds:
+            await self.register(guild)
+            logging.info("Joined {}".format(guild.name))
+
+        #await self.tree.sync() 
+        logging.info(config.STARTUP_COMPLETE_MESSAGE)
+
+        
+    async def on_guild_join(self,guild) -> None:
+        logging.info(guild.name)
+        await self.register(guild)
+
+
+    async def register(self,guild) -> None:
+
+        guild_to_settings[guild] = Settings(guild)
+        guild_to_audiocontroller[guild] = AudioController(self, guild)
+
+        sett = guild_to_settings[guild]
+
+
+        if config.GLOBAL_DISABLE_AUTOJOIN_VC == True:
+            return
+
+        vc_channels = guild.voice_channels
+
+        if sett.get('vc_timeout') == False:
+            if not sett.get('start_voice_channel') == None:
+                for vc in vc_channels:
+                    if vc.id == sett.get('start_voice_channel'):
+                        try:
+                            controler = guild_to_audiocontroller[guild]
+                            await controler.register_voice_channel(vc_channels[vc_channels.index(vc)])
+                            if not sett.get("autoplay_url") == "":
+                                await controler.process_song(sett.get("autoplay_url"))
+                                await controler.timer.cancel()
+                        except Exception as e:
+                            logging.error(e)
 
 
 if __name__ == '__main__':
 
-    config.ABSOLUTE_PATH = os.path.dirname(os.path.abspath(__file__))
-    config.COOKIE_PATH = config.ABSOLUTE_PATH + config.COOKIE_PATH
-
     if config.BOT_TOKEN == "":
-        print("Error: No bot token!")
+        logging.error("Error: No bot token!")
         exit
-
-    for extension in initial_extensions:
-        try:
-            bot.load_extension(extension)
-        except Exception as e:
-            print(e)
-
-
-@bot.event
-async def on_ready():
-    print(config.STARTUP_MESSAGE)
-    await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Music"))
-
-    for guild in bot.guilds:
-        await register(guild)
-        print("Joined {}".format(guild.name))
-
-    print(config.STARTUP_COMPLETE_MESSAGE)
-
-
-@bot.event
-async def on_guild_join(guild):
-    print(guild.name)
-    await register(guild)
-
-
-async def register(guild):
-
-    guild_to_settings[guild] = Settings(guild)
-    guild_to_audiocontroller[guild] = AudioController(bot, guild)
-
-    sett = guild_to_settings[guild]
-
-    try:
-        await guild.me.edit(nick=sett.get('default_nickname'))
-    except:
-        pass
-
-    if config.GLOBAL_DISABLE_AUTOJOIN_VC == True:
-        return
-
-    vc_channels = guild.voice_channels
-
-    if sett.get('vc_timeout') == False:
-        if sett.get('start_voice_channel') == None:
-            try:
-                await guild_to_audiocontroller[guild].register_voice_channel(guild.voice_channels[0])
-            except Exception as e:
-                print(e)
-
-        else:
-            for vc in vc_channels:
-                if vc.id == sett.get('start_voice_channel'):
-                    try:
-                        await guild_to_audiocontroller[guild].register_voice_channel(vc_channels[vc_channels.index(vc)])
-                    except Exception as e:
-                        print(e)
-
-
-bot.run(config.BOT_TOKEN, reconnect=True)
+    intents = discord.Intents.default()
+    intents.message_content = True
+    client = disClient(intents=intents, test_guilds=[228454166014459904], command_prefix=config.BOT_PREFIX, case_insensitive=True)
+    client.run(os.getenv("discord_bot_token"), reconnect=True, root_logger=True)

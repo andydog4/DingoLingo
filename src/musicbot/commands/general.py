@@ -3,6 +3,7 @@ from config import config
 from discord.ext import commands
 from discord.ext.commands import has_permissions
 from musicbot import utils
+from discord import app_commands
 from musicbot.audiocontroller import AudioController
 from musicbot.utils import guild_to_audiocontroller, guild_to_settings
 
@@ -18,19 +19,22 @@ class General(commands.Cog):
         self.bot = bot
 
     # logic is split to uconnect() for wide usage
-    @commands.command(name='connect', description=config.HELP_CONNECT_LONG, help=config.HELP_CONNECT_SHORT, aliases=['c'])
+    @app_commands.command(name='connect', description=config.HELP_CONNECT)
+    @app_commands.guild_only
     async def _connect(self, ctx):  # dest_channel_name: str
         current_guild = utils.get_guild(self.bot, ctx)
         audiocontroller = utils.guild_to_audiocontroller[current_guild]
         await audiocontroller.uconnect(ctx)
 
-    @commands.command(name='disconnect', description=config.HELP_DISCONNECT_LONG, help=config.HELP_DISCONNECT_SHORT, aliases=['dc'])
+    @app_commands.command(name='disconnect', description=config.HELP_DISCONNECT)
+    @app_commands.guild_only
     async def _disconnect(self, ctx, guild=False):
         current_guild = utils.get_guild(self.bot, ctx)
         audiocontroller = utils.guild_to_audiocontroller[current_guild]
         await audiocontroller.udisconnect()
 
-    @commands.command(name='reset', description=config.HELP_DISCONNECT_LONG, help=config.HELP_DISCONNECT_SHORT, aliases=['rs', 'restart'])
+    @app_commands.command(name='reset', description=config.HELP_DISCONNECT)
+    @app_commands.guild_only
     async def _reset(self, ctx):
         current_guild = utils.get_guild(self.bot, ctx)
 
@@ -46,7 +50,8 @@ class General(commands.Cog):
 
         await ctx.send("{} Connected to {}".format(":white_check_mark:", ctx.author.voice.channel.name))
 
-    @commands.command(name='changechannel', description=config.HELP_CHANGECHANNEL_LONG, help=config.HELP_CHANGECHANNEL_SHORT, aliases=['cc'])
+    @app_commands.command(name='changechannel', description=config.HELP_CHANGECHANNEL)
+    @app_commands.guild_only
     async def _change_channel(self, ctx):
         current_guild = utils.get_guild(self.bot, ctx)
 
@@ -67,12 +72,15 @@ class General(commands.Cog):
 
         await ctx.send("{} Switched to {}".format(":white_check_mark:", ctx.author.voice.channel.name))
 
-    @commands.command(name='ping', description=config.HELP_PING_LONG, help=config.HELP_PING_SHORT)
+    @app_commands.command(name='ping', description=config.HELP_PING)
+    @app_commands.guild_only
     async def _ping(self, ctx):
         await ctx.send("Pong")
 
-    @commands.command(name='setting', description=config.HELP_SHUFFLE_LONG, help=config.HELP_SETTINGS_SHORT, aliases=['settings', 'set'])
-    @has_permissions(administrator=True)
+    @app_commands.command(name='setting', description=config.HELP_SHUFFLE)
+    @app_commands.guild_only
+    @commands.is_owner
+    @commands.has_permissions(administrator=True)
     async def _settings(self, ctx, *args):
 
         sett = guild_to_settings[ctx.guild]
@@ -91,7 +99,8 @@ class General(commands.Cog):
         elif response is True:
             await ctx.send("Setting updated!")
 
-    @commands.command(name='addbot', description=config.HELP_ADDBOT_LONG, help=config.HELP_ADDBOT_SHORT)
+    @app_commands.command(name='addbot', description=config.HELP_ADDBOT, help=config.HELP_ADDBOT_SHORT)
+    @commands.is_owner
     async def _addbot(self, ctx):
         embed = discord.Embed(title="Invite", description=config.ADD_MESSAGE +
                               "(https://discordapp.com/oauth2/authorize?client_id={}&scope=bot>)".format(self.bot.user.id))

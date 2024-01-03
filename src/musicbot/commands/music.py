@@ -1,10 +1,10 @@
-import asyncio
-
-import discord
-from config import config
+import asyncio, discord
 from discord.ext import commands
 from discord import app_commands
+from config import config
 from musicbot import linkutils, utils
+
+from musicbot.plugins import button
 
 
 class Music(commands.Cog):
@@ -19,9 +19,8 @@ class Music(commands.Cog):
 
     @app_commands.command(name='play', description=config.DESCRIPTION_YT)
     @app_commands.guild_only
-    async def _play_song(self, ctx:discord.Interaction, *, track: str):
-        await ctx.response.defer()
-
+    async def _play_song(self, ctx:discord.Interaction, *, track: str) -> bool:
+        if not ctx.response.is_done(): asyncio.create_task(ctx.response.defer())
         current_guild = ctx.guild
         audiocontroller = utils.guild_to_audiocontroller[current_guild]
 
@@ -50,19 +49,21 @@ class Music(commands.Cog):
             return
 
         if song.origin == linkutils.Origins.Default:
-
+            
+            view = button.music_buttons(bot=self.bot)
             if audiocontroller.current_song != None and len(audiocontroller.playlist.playque) == 0:
-                await ctx.send(embed=song.info.format_output(config.SONGINFO_NOW_PLAYING))
+                await ctx.send(embed=song.info.format_output(config.SONGINFO_NOW_PLAYING), view=view)
             else:
                 await ctx.send(embed=song.info.format_output(config.SONGINFO_QUEUE_ADDED))
 
         elif song.origin == linkutils.Origins.Playlist:
             await ctx.send(config.SONGINFO_PLAYLIST_QUEUED)
+        return True
 
     @app_commands.command(name='loop', description=config.DESCRIPTION_LOOP)
     @app_commands.guild_only
     async def _loop(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
         audiocontroller = utils.guild_to_audiocontroller[current_guild]
@@ -84,7 +85,7 @@ class Music(commands.Cog):
     @app_commands.command(name='shuffle', description=config.DESCRIPTION_SHUFFLE)
     @app_commands.guild_only
     async def _shuffle(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
         audiocontroller = utils.guild_to_audiocontroller[current_guild]
@@ -105,7 +106,7 @@ class Music(commands.Cog):
     @app_commands.command(name='pause', description=config.DESCRIPTION_PAUSE)
     @app_commands.guild_only
     async def _pause(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -120,7 +121,7 @@ class Music(commands.Cog):
     @app_commands.command(name='queue', description=config.DESCRIPTION_QUEUE)
     @app_commands.guild_only
     async def _queue(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -153,7 +154,7 @@ class Music(commands.Cog):
     @app_commands.command(name='stop', description=config.DESCRIPTION_STOP)
     @app_commands.guild_only
     async def _stop(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -169,7 +170,7 @@ class Music(commands.Cog):
     @app_commands.command(name='move', description=config.DESCRIPTION_MOVE)
     @app_commands.guild_only
     async def _move(self, ctx, oldindex:int, newindex:int):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
         audiocontroller = utils.guild_to_audiocontroller[current_guild]
@@ -188,7 +189,7 @@ class Music(commands.Cog):
     @app_commands.command(name='skip', description=config.DESCRIPTION_SKIP)
     @app_commands.guild_only
     async def _skip(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -211,7 +212,7 @@ class Music(commands.Cog):
     @app_commands.command(name='clear', description=config.DESCRIPTION_CLEAR)
     @app_commands.guild_only
     async def _clear(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -227,7 +228,7 @@ class Music(commands.Cog):
     @app_commands.command(name='prev', description=config.DESCRIPTION_PREV)
     @app_commands.guild_only
     async def _prev(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -246,7 +247,7 @@ class Music(commands.Cog):
     @app_commands.command(name='resume', description=config.DESCRIPTION_RESUME)
     @app_commands.guild_only
     async def _resume(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -259,7 +260,7 @@ class Music(commands.Cog):
     @app_commands.command(name='songinfo', description=config.DESCRIPTION_SONGINFO)
     @app_commands.guild_only
     async def _songinfo(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -274,7 +275,7 @@ class Music(commands.Cog):
     @app_commands.command(name='history', description=config.DESCRIPTION_HISTORY)
     @app_commands.guild_only
     async def _history(self, ctx):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         current_guild = ctx.guild
 
@@ -286,7 +287,7 @@ class Music(commands.Cog):
     @app_commands.command(name='volume', description=config.DESCRIPTION_VOL)
     @app_commands.guild_only
     async def _volume(self, ctx, volume: int = None):
-        await ctx.response.defer()
+        if not ctx.response.is_done(): await ctx.response.defer()
 
         if await utils.play_check(ctx) == False:
             return

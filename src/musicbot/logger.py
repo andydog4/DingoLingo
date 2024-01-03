@@ -9,6 +9,7 @@ if not "-l" in sys.argv:
     file_handler = logging.FileHandler("log.log","a",'utf-8')
     file_handler.setFormatter(logging.Formatter(date_format,'%y:%m:%d %H:%M:%S'))
     file_handler.setLevel(logging.INFO)
+    root_logger.setLevel(logging.DEBUG)
     root_logger.addHandler(file_handler)
 
 class error_handler():

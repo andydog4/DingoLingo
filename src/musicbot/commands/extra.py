@@ -1,9 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from musicbot.commands import music
 from musicbot import utils, songinfo
-from config import config
 
 stations = {
     "Radio Brony":"https://radiobrony.live/hls/aac_hifi.m3u8",
@@ -30,7 +28,8 @@ class Extra(commands.Cog):
     @app_commands.command(name="sync")
     @commands.is_owner()
     async def _sync(self, inter:discord.Interaction) -> None:
-        self.bot.tree.sync()
+        await inter.client.tree.sync()
+        await inter.send("synced")
 
     
     #play radio stream
@@ -38,17 +37,18 @@ class Extra(commands.Cog):
     @app_commands.guild_only
     @app_commands.choices(station=[app_commands.Choice(name=station, value=station) for station in stations.keys()])
     async def _radio(self, inter:discord.Interaction, station:str) -> None:
+        if not inter.response.is_done(): await inter.response.defer()
         await utils.guild_to_audiocontroller[inter.guild].stop_player()
-        await self.bot.get_cog('Music')._play_song.callback(self, inter, track=stations[station])
-        song = songinfo.Song.Sinfo("Internet",station,-1,None,None)
-        await inter.send(embed=song.format_output("Now Playing"))
+        if await inter.client.get_cog('Music')._play_song.callback(inter.client.get_cog('Music'), inter, track=stations[station]):
+            song = songinfo.Song.Sinfo("Internet",station,-1,None,None)
+            await inter.send(embed=song.format_output("Now Playing"))
 
 
     #autocompleate radio stream command
-    @_radio.autocomplete("station")
+    #@_radio.autocomplete("station")
     async def _radio_autocomplete(self, interaction: discord.Interaction, current: str) -> list[app_commands.Choice[str]]:
-        return [app_commands.Choice(name=station, value=station) for station in stations.keys() if current.lower() in station.lower()]
-
+        print("autocompleat")
+        return [app_commands.Choice(name=station, value=station) for station in stations.keys()]# if current.lower() in station.lower()]     
 
 
 async def setup(bot) -> None:
